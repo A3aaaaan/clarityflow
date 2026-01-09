@@ -1,21 +1,33 @@
 const http = require("http");
 const fs = require("fs");
+const url = require("url");
 
 const PORT = process.env.PORT || 8080;
 
 const server = http.createServer((req, res) => {
-  let file = "index.html";
+  const pathname = url.parse(req.url).pathname;
 
- if (req.url === "/login") file = "login.html";
-if (req.url.startsWith("/dashboard")) file = "dashboard.html";
+  let file;
 
+  if (pathname === "/") {
+    file = "index.html";
+  } else if (pathname === "/login") {
+    file = "login.html";
+  } else if (pathname === "/dashboard") {
+    file = "dashboard.html";
+  } else {
+    res.writeHead(404);
+    res.end("Pagina niet gevonden");
+    return;
+  }
 
   fs.readFile(file, (err, data) => {
     if (err) {
-      res.writeHead(404);
-      res.end("Pagina niet gevonden");
+      res.writeHead(500);
+      res.end("Fout bij laden van pagina");
       return;
     }
+
     res.writeHead(200, { "Content-Type": "text/html" });
     res.end(data);
   });
