@@ -25,17 +25,13 @@ h1 {
   text-align: center;
 }
 
-.controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
+/* Invoer */
 input, textarea, select {
   width: 100%;
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #ccc;
+  margin-bottom: 8px;
 }
 
 textarea {
@@ -44,7 +40,7 @@ textarea {
 }
 
 button {
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 6px;
   border: none;
   cursor: pointer;
@@ -53,34 +49,62 @@ button {
 .add {
   background: #1f2a44;
   color: white;
+  margin-bottom: 15px;
 }
 
+/* Filters */
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* Tabel */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  table-layout: fixed; /* CRUCIAAL */
 }
 
 th, td {
-  border-bottom: 1px solid #ddd;
   padding: 10px;
   vertical-align: top;
+  border-right: 1px solid #ddd;
+}
+
+th:last-child,
+td:last-child {
+  border-right: none;
 }
 
 th {
   background: #f1f3f6;
+  border-bottom: 2px solid #ccc;
+}
+
+tr {
+  border-bottom: 1px solid #ddd;
 }
 
 tr.done {
   background: #e6f4ea;
-  text-decoration: line-through;
   color: #666;
+  text-decoration: line-through;
 }
 
+/* Kolombreedtes */
+.col-naam { width: 15%; }
+.col-datum { width: 18%; }
+.col-locatie { width: 17%; }
+.col-notities { width: 30%; }
+.col-acties { width: 20%; }
+
+/* Notities */
 .note {
-  max-height: 48px;
+  max-height: 40px;        /* ± 2 regels */
   overflow: hidden;
   white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .note.expanded {
@@ -88,16 +112,20 @@ tr.done {
 }
 
 .toggle {
+  display: inline-block;
   font-size: 12px;
   color: #1f2a44;
   cursor: pointer;
+  margin-top: 4px;
 }
 
+/* Labels */
 .badge {
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 12px;
   display: inline-block;
+  margin-bottom: 4px;
 }
 
 .online {
@@ -141,11 +169,11 @@ tr.done {
 <table>
 <thead>
 <tr>
-  <th>Naam</th>
-  <th>Datum & tijd</th>
-  <th>Locatie</th>
-  <th>Notities</th>
-  <th>Acties</th>
+  <th class="col-naam">Naam</th>
+  <th class="col-datum">Datum & tijd</th>
+  <th class="col-locatie">Locatie</th>
+  <th class="col-notities">Notities</th>
+  <th class="col-acties">Acties</th>
 </tr>
 </thead>
 <tbody id="tableBody"></tbody>
@@ -169,8 +197,8 @@ function render() {
   const body = document.getElementById("tableBody");
   body.innerHTML = "";
 
-  const search = document.getElementById("search").value.toLowerCase();
-  const filter = document.getElementById("filter").value;
+  const search = searchInput().toLowerCase();
+  const filter = filterSelect();
 
   clients
     .sort((a,b) => new Date(a.datetime) - new Date(b.datetime))
@@ -182,17 +210,17 @@ function render() {
       if (c.done) row.classList.add("done");
 
       row.innerHTML = `
-        <td>${c.naam}</td>
-        <td>${formatDate(c.datetime)}</td>
-        <td>
+        <td class="col-naam">${c.naam}</td>
+        <td class="col-datum">${formatDate(c.datetime)}</td>
+        <td class="col-locatie">
           <span class="badge ${c.type}">${c.type === "online" ? "Online" : "Fysiek"}</span><br>
           ${c.locatie}
         </td>
-        <td>
+        <td class="col-notities">
           <div class="note">${c.notities}</div>
           ${c.notities.length > 60 ? `<span class="toggle" onclick="toggleNote(this)">Meer tonen</span>` : ""}
         </td>
-        <td>
+        <td class="col-acties">
           <button onclick="edit(${i})">✏️</button>
           <button onclick="toggleDone(${i})">✔️</button>
           <button onclick="remove(${i})">🗑️</button>
@@ -200,6 +228,14 @@ function render() {
       `;
       body.appendChild(row);
     });
+}
+
+function searchInput() {
+  return document.getElementById("search").value;
+}
+
+function filterSelect() {
+  return document.getElementById("filter").value;
 }
 
 function addClient() {
