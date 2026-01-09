@@ -7,15 +7,19 @@ const PORT = process.env.PORT || 8080;
 const server = http.createServer((req, res) => {
   const pathname = url.parse(req.url).pathname;
 
-  let file;
+  let file = null;
 
-  if (pathname === "/") {
+  if (pathname === "/" || pathname === "/index.html") {
     file = "index.html";
-  } else if (pathname === "/login") {
+  } 
+  else if (pathname.startsWith("/login")) {
     file = "login.html";
-  } else if (pathname === "/dashboard") {
+  } 
+  else if (pathname.startsWith("/dashboard")) {
     file = "dashboard.html";
-  } else {
+  }
+
+  if (!file) {
     res.writeHead(404);
     res.end("Pagina niet gevonden");
     return;
@@ -34,5 +38,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log("ClarityFlow draait");
+  console.log("ClarityFlow draait op poort " + PORT);
 });
