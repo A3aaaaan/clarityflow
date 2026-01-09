@@ -4,10 +4,16 @@ const fs = require("fs");
 const PORT = process.env.PORT || 8080;
 
 const server = http.createServer((req, res) => {
-  fs.readFile("index.html", (err, data) => {
+  let file = "index.html";
+
+ if (req.url === "/login") file = "login.html";
+if (req.url.startsWith("/dashboard")) file = "dashboard.html";
+
+
+  fs.readFile(file, (err, data) => {
     if (err) {
-      res.writeHead(500);
-      res.end("Fout bij laden van pagina");
+      res.writeHead(404);
+      res.end("Pagina niet gevonden");
       return;
     }
     res.writeHead(200, { "Content-Type": "text/html" });
@@ -16,5 +22,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`ClarityFlow draait op poort ${PORT}`);
+  console.log("ClarityFlow draait");
 });
