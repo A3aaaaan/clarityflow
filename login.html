@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Inloggen – ClarityFlow</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f7f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      width: 320px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #1f2a44;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Inloggen</h2>
+    <form action="/dashboard">
+      <input type="text" placeholder="Naam" required>
+      <button>Ga verder</button>
+    </form>
+  </div>
+</body>
+</html>
