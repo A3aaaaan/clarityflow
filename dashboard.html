@@ -63,19 +63,46 @@
     <ul id="list"></ul>
   </div>
 
-  <script>
-    function addItem() {
-      const input = document.getElementById("itemInput");
-      const list = document.getElementById("list");
+<script>
+  const list = document.getElementById("list");
 
-      if (input.value.trim() === "") return;
+  function loadItems() {
+    const items = JSON.parse(localStorage.getItem("items")) || [];
+    items.forEach(text => createItem(text));
+  }
 
-      const li = document.createElement("li");
-      li.textContent = input.value;
-      list.appendChild(li);
+  function saveItems() {
+    const items = [];
+    document.querySelectorAll("#list li").forEach(li => {
+      items.push(li.textContent);
+    });
+    localStorage.setItem("items", JSON.stringify(items));
+  }
 
-      input.value = "";
-    }
-  </script>
+  function createItem(text) {
+    const li = document.createElement("li");
+    li.textContent = text;
+
+    li.onclick = function () {
+      li.remove();
+      saveItems();
+    };
+
+    list.appendChild(li);
+  }
+
+  function addItem() {
+    const input = document.getElementById("itemInput");
+    if (input.value.trim() === "") return;
+
+    createItem(input.value);
+    input.value = "";
+    saveItems();
+  }
+
+  loadItems();
+</script>
+
+
 </body>
 </html>
