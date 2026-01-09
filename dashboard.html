@@ -1,192 +1,258 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <title>Mijn klanten – ClarityFlow</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f6f7f9;
-      padding: 30px;
-      margin: 0;
-    }
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    }
-    h1 {
-      text-align: center;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      margin-right: 4px;
-    }
-    .add {
-      background: #1f2a44;
-      color: white;
-      margin-top: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border-bottom: 1px solid #ddd;
-      padding: 8px;
-      vertical-align: top;
-    }
-    th {
-      background: #f1f3f6;
-    }
-    tr.done {
-      background: #e6f4ea;
-      color: #666;
-      text-decoration: line-through;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Mijn klanten – ClarityFlow</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f6f7f9;
+  padding: 30px;
+  margin: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+h1 {
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  resize: none;
+  height: 60px;
+}
+
+button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.add {
+  background: #1f2a44;
+  color: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border-bottom: 1px solid #ddd;
+  padding: 10px;
+  vertical-align: top;
+}
+
+th {
+  background: #f1f3f6;
+}
+
+tr.done {
+  background: #e6f4ea;
+  text-decoration: line-through;
+  color: #666;
+}
+
+.note {
+  max-height: 48px;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.note.expanded {
+  max-height: none;
+}
+
+.toggle {
+  font-size: 12px;
+  color: #1f2a44;
+  cursor: pointer;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.online {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.fysiek {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+</style>
 </head>
 
 <body>
 <div class="container">
-  <h1>Mijn klanten</h1>
 
-  <input id="naam" placeholder="Naam klant">
-  <input id="datetime" type="datetime-local">
-  <input id="locatie" placeholder="Locatie afspraak">
-  <textarea id="notities" placeholder="Notities"></textarea>
+<h1>Mijn klanten</h1>
 
-  <button class="add" onclick="addClient()">Toevoegen</button>
+<!-- Invoer -->
+<input id="naam" placeholder="Naam klant">
+<input id="datetime" type="datetime-local">
+<select id="locatieType">
+  <option value="online">Online afspraak</option>
+  <option value="fysiek">Fysieke afspraak</option>
+</select>
+<input id="locatie" placeholder="Locatie (Zoom / Kantoor / Adres)">
+<textarea id="notities" placeholder="Notities"></textarea>
+<button class="add" onclick="addClient()">Toevoegen</button>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Naam</th>
-        <th>Datum & tijd</th>
-        <th>Locatie</th>
-        <th>Notities</th>
-        <th>Acties</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+<!-- Filters -->
+<div class="controls">
+  <input id="search" placeholder="Zoek op klantnaam" oninput="render()">
+  <select id="filter" onchange="render()">
+    <option value="all">Alles</option>
+    <option value="open">Open</option>
+    <option value="done">Afgerond</option>
+  </select>
+</div>
+
+<table>
+<thead>
+<tr>
+  <th>Naam</th>
+  <th>Datum & tijd</th>
+  <th>Locatie</th>
+  <th>Notities</th>
+  <th>Acties</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+
 </div>
 
 <script>
-  const tableBody = document.getElementById("tableBody");
+let clients = JSON.parse(localStorage.getItem("clients")) || [];
 
-  function formatDateTime(value) {
-    if (!value) return "";
-    const d = new Date(value);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const year = d.getFullYear();
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
-    return `${day}-${month}-${year} ${hours}:${minutes}`;
-  }
+function formatDate(value) {
+  const d = new Date(value);
+  return `${String(d.getDate()).padStart(2,"0")}-${String(d.getMonth()+1).padStart(2,"0")}-${d.getFullYear()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
 
-  function loadClients() {
-    const clients = JSON.parse(localStorage.getItem("clients")) || [];
-    clients.forEach(client => addRow(client));
-  }
+function save() {
+  localStorage.setItem("clients", JSON.stringify(clients));
+}
 
-  function saveClients() {
-    const clients = [];
-    document.querySelectorAll("#tableBody tr").forEach(row => {
-      clients.push({
-        naam: row.dataset.naam,
-        datetime: row.dataset.datetime,
-        locatie: row.dataset.locatie,
-        notities: row.dataset.notities,
-        done: row.classList.contains("done")
-      });
+function render() {
+  const body = document.getElementById("tableBody");
+  body.innerHTML = "";
+
+  const search = document.getElementById("search").value.toLowerCase();
+  const filter = document.getElementById("filter").value;
+
+  clients
+    .sort((a,b) => new Date(a.datetime) - new Date(b.datetime))
+    .filter(c => c.naam.toLowerCase().includes(search))
+    .filter(c => filter === "all" || (filter === "open" && !c.done) || (filter === "done" && c.done))
+    .forEach((c,i) => {
+
+      const row = document.createElement("tr");
+      if (c.done) row.classList.add("done");
+
+      row.innerHTML = `
+        <td>${c.naam}</td>
+        <td>${formatDate(c.datetime)}</td>
+        <td>
+          <span class="badge ${c.type}">${c.type === "online" ? "Online" : "Fysiek"}</span><br>
+          ${c.locatie}
+        </td>
+        <td>
+          <div class="note">${c.notities}</div>
+          ${c.notities.length > 60 ? `<span class="toggle" onclick="toggleNote(this)">Meer tonen</span>` : ""}
+        </td>
+        <td>
+          <button onclick="edit(${i})">✏️</button>
+          <button onclick="toggleDone(${i})">✔️</button>
+          <button onclick="remove(${i})">🗑️</button>
+        </td>
+      `;
+      body.appendChild(row);
     });
-    localStorage.setItem("clients", JSON.stringify(clients));
+}
+
+function addClient() {
+  if (!naam.value) return;
+
+  clients.push({
+    naam: naam.value,
+    datetime: datetime.value,
+    type: locatieType.value,
+    locatie: locatie.value,
+    notities: notities.value,
+    done: false
+  });
+
+  naam.value = datetime.value = locatie.value = notities.value = "";
+  save();
+  render();
+}
+
+function edit(i) {
+  const c = clients[i];
+  naam.value = c.naam;
+  datetime.value = c.datetime;
+  locatieType.value = c.type;
+  locatie.value = c.locatie;
+  notities.value = c.notities;
+  clients.splice(i,1);
+  save();
+  render();
+}
+
+function toggleDone(i) {
+  clients[i].done = !clients[i].done;
+  save();
+  render();
+}
+
+function remove(i) {
+  if (confirm("Weet je zeker dat je deze klant wilt verwijderen?")) {
+    clients.splice(i,1);
+    save();
+    render();
   }
+}
 
-  function addRow(client) {
-    const row = document.createElement("tr");
-    if (client.done) row.classList.add("done");
+function toggleNote(el) {
+  const note = el.previousElementSibling;
+  note.classList.toggle("expanded");
+  el.textContent = note.classList.contains("expanded") ? "Minder tonen" : "Meer tonen";
+}
 
-    row.dataset.naam = client.naam;
-    row.dataset.datetime = client.datetime;
-    row.dataset.locatie = client.locatie;
-    row.dataset.notities = client.notities;
-
-    row.innerHTML = `
-      <td>${client.naam}</td>
-      <td>${formatDateTime(client.datetime)}</td>
-      <td>${client.locatie}</td>
-      <td>${client.notities}</td>
-      <td>
-        <button onclick="editRow(this)">✏️</button>
-        <button onclick="toggleDone(this)">✔️</button>
-        <button onclick="deleteRow(this)">🗑️</button>
-      </td>
-    `;
-
-    tableBody.appendChild(row);
-  }
-
-  function addClient() {
-    const client = {
-      naam: naam.value,
-      datetime: datetime.value,
-      locatie: locatie.value,
-      notities: notities.value,
-      done: false
-    };
-
-    if (!client.naam) return;
-
-    addRow(client);
-    saveClients();
-
-    naam.value = "";
-    datetime.value = "";
-    locatie.value = "";
-    notities.value = "";
-  }
-
-  function editRow(btn) {
-    const row = btn.closest("tr");
-    naam.value = row.dataset.naam;
-    datetime.value = row.dataset.datetime;
-    locatie.value = row.dataset.locatie;
-    notities.value = row.dataset.notities;
-
-    row.remove();
-    saveClients();
-  }
-
-  function toggleDone(btn) {
-    const row = btn.closest("tr");
-    row.classList.toggle("done");
-    saveClients();
-  }
-
-  function deleteRow(btn) {
-    if (!confirm("Weet je zeker dat je deze klant wilt verwijderen?")) return;
-    btn.closest("tr").remove();
-    saveClients();
-  }
-
-  loadClients();
+render();
 </script>
+
 </body>
 </html>
