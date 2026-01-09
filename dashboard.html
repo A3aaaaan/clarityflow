@@ -2,108 +2,146 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard – ClarityFlow</title>
+  <title>Mijn klanten – ClarityFlow</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f6f7f9;
-      padding: 40px;
+      padding: 30px;
       margin: 0;
     }
-    .card {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 600px;
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 1000px;
       margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
-    h1 {
-      margin-top: 0;
-    }
-    input {
+    input, textarea {
       width: 100%;
-      padding: 12px;
-      margin: 15px 0;
+      padding: 8px;
+      margin-bottom: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 16px;
     }
     button {
-      padding: 12px 20px;
+      padding: 10px 16px;
       background: #1f2a44;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 16px;
     }
-    ul {
-      list-style: none;
-      padding: 0;
+    table {
+      width: 100%;
+      border-collapse: collapse;
       margin-top: 20px;
     }
-    li {
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
       background: #f1f3f6;
-      padding: 10px 14px;
-      border-radius: 6px;
-      margin-bottom: 8px;
+    }
+    tr:hover {
+      background: #f9fafb;
     }
   </style>
 </head>
 
 <body>
-  <div class="card">
-  <h1>Mijn klanten</h1>
-<p>Noteer je klanten en wat je met hen hebt afgesproken.</p>
+  <div class="container">
+    <h1>Mijn klanten</h1>
 
-<input id="itemInput" type="text" placeholder="Bijv. Jan – intake gepland">
+    <input id="naam" placeholder="Naam klant">
+    <input id="datetime" type="datetime-local">
+    <input id="locatie" placeholder="Locatie afspraak">
+    <textarea id="notities" placeholder="Notities"></textarea>
 
-    <button onclick="addItem()">Toevoegen</button>
+    <button onclick="addClient()">Toevoegen</button>
 
-    <ul id="list"></ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Naam klant</th>
+          <th>Datum & tijd</th>
+          <th>Locatie</th>
+          <th>Notities</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
   </div>
 
-<script>
-  const list = document.getElementById("list");
+  <script>
+    const tableBody = document.getElementById("tableBody");
 
-  function loadItems() {
-    const items = JSON.parse(localStorage.getItem("items")) || [];
-    items.forEach(text => createItem(text));
-  }
+    function loadClients() {
+      const clients = JSON.parse(localStorage.getItem("clients")) || [];
+      clients.forEach(client => addRow(client));
+    }
 
-  function saveItems() {
-    const items = [];
-    document.querySelectorAll("#list li").forEach(li => {
-      items.push(li.textContent);
-    });
-    localStorage.setItem("items", JSON.stringify(items));
-  }
+    function saveClients() {
+      const clients = [];
+      document.querySelectorAll("#tableBody tr").forEach(row => {
+        const cells = row.querySelectorAll("td");
+        clients.push({
+          naam: cells[0].innerText,
+          datetime: cells[1].innerText,
+          locatie: cells[2].innerText,
+          notities: cells[3].innerText
+        });
+      });
+      localStorage.setItem("clients", JSON.stringify(clients));
+    }
 
-  function createItem(text) {
-    const li = document.createElement("li");
-    li.textContent = text;
+    function addRow(client) {
+      const row = document.createElement("tr");
 
-    li.onclick = function () {
-      li.remove();
-      saveItems();
-    };
+      row.innerHTML = `
+        <td>${client.naam}</td>
+        <td>${client.datetime}</td>
+        <td>${client.locatie}</td>
+        <td>${client.notities}</td>
+      `;
 
-    list.appendChild(li);
-  }
+      row.onclick = function () {
+        if (confirm("Deze afspraak verwijderen?")) {
+          row.remove();
+          saveClients();
+        }
+      };
 
-  function addItem() {
-    const input = document.getElementById("itemInput");
-    if (input.value.trim() === "") return;
+      tableBody.appendChild(row);
+    }
 
-    createItem(input.value);
-    input.value = "";
-    saveItems();
-  }
+    function addClient() {
+      const client = {
+        naam: document.getElementById("naam").value,
+        datetime: document.getElementById("datetime").value,
+        locatie: document.getElementById("locatie").value,
+        notities: document.getElementById("notities").value
+      };
 
-  loadItems();
-</script>
+      if (!client.naam) return;
 
+      addRow(client);
+      saveClients();
 
+      document.getElementById("naam").value = "";
+      document.getElementById("datetime").value = "";
+      document.getElementById("locatie").value = "";
+      document.getElementById("notities").value = "";
+    }
+
+    loadClients();
+  </script>
 </body>
 </html>
