@@ -1,5 +1,6 @@
 const http = require("http");
 const fs = require("fs");
+const path = require("path");
 const url = require("url");
 
 const PORT = process.env.PORT || 8080;
@@ -7,15 +8,13 @@ const PORT = process.env.PORT || 8080;
 const server = http.createServer((req, res) => {
   const pathname = url.parse(req.url).pathname;
 
-  let file = null;
+  let file;
 
   if (pathname === "/" || pathname === "/index.html") {
     file = "index.html";
-  } 
-  else if (pathname.startsWith("/login")) {
+  } else if (pathname.startsWith("/login")) {
     file = "login.html";
-  } 
-  else if (pathname.startsWith("/dashboard")) {
+  } else if (pathname.startsWith("/dashboard")) {
     file = "dashboard.html";
   }
 
@@ -25,10 +24,13 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  fs.readFile(file, (err, data) => {
+  const filePath = path.join(__dirname, file);
+
+  fs.readFile(filePath, (err, data) => {
     if (err) {
+      console.error(err);
       res.writeHead(500);
-      res.end("Fout bij laden van pagina");
+      res.end("Fout bij laden pagina");
       return;
     }
 
