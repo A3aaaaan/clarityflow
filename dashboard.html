@@ -1,294 +1,401 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<title>Mijn klanten – ClarityFlow</title>
-
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f6f7f9;
-  padding: 30px;
-  margin: 0;
-}
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f7fa;
+    color: #1f2937;
+  }
 
-.container {
-  max-width: 1200px;
-  margin: auto;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-}
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+  }
 
-h1 {
-  text-align: center;
-}
+  .logo-text {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1f2a44;
+  }
 
-/* Invoer */
-input, textarea, select {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-bottom: 8px;
-}
+  .search input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    width: 220px;
+  }
 
-textarea {
-  resize: none;
-  height: 60px;
-}
+  .container {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
 
-button {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-}
+  .add-client {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
 
-.add {
-  background: #1f2a44;
-  color: white;
-  margin-bottom: 15px;
-}
+  .add-client input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+  }
 
-/* Filters */
-.controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
+  .add-client button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    background: #1f2a44;
+    color: white;
+    cursor: pointer;
+  }
 
-/* Tabel */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed; /* CRUCIAAL */
-}
+  .clients {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-th, td {
-  padding: 10px;
-  vertical-align: top;
-  border-right: 1px solid #ddd;
-}
+  .client-card {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #e5e7eb;
+  }
 
-th:last-child,
-td:last-child {
-  border-right: none;
-}
+  .client-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
 
-th {
-  background: #f1f3f6;
-  border-bottom: 2px solid #ccc;
-}
+  .client-header h2 {
+    margin: 0;
+    font-size: 18px;
+  }
 
-tr {
-  border-bottom: 1px solid #ddd;
-}
+  .status-toggle {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    border: none;
+  }
 
-tr.done {
-  background: #e6f4ea;
-  color: #666;
-  text-decoration: line-through;
-}
+  .status-toggle.active {
+    background: #e0f2fe;
+    color: #0369a1;
+  }
 
-/* Kolombreedtes */
-.col-naam { width: 15%; }
-.col-datum { width: 18%; }
-.col-locatie { width: 17%; }
-.col-notities { width: 30%; }
-.col-acties { width: 20%; }
+  .status-toggle.done {
+    background: #ecfeff;
+    color: #0f766e;
+  }
 
-/* Notities */
-.note {
-  max-height: 40px;        /* ± 2 regels */
-  overflow: hidden;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
+  .client-summary {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 6px;
+  }
 
-.note.expanded {
-  max-height: none;
-}
+  .client-body {
+    display: none;
+    margin-top: 12px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
+  }
 
-.toggle {
-  display: inline-block;
-  font-size: 12px;
-  color: #1f2a44;
-  cursor: pointer;
-  margin-top: 4px;
-}
+  .client-card.open .client-body {
+    display: block;
+  }
 
-/* Labels */
-.badge {
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  display: inline-block;
-  margin-bottom: 4px;
-}
+  .appointment {
+    padding: 10px;
+    border-radius: 10px;
+    background: #f9fafb;
+    margin-bottom: 8px;
+  }
 
-.online {
-  background: #e3f2fd;
-  color: #1565c0;
-}
+  .appointment.online {
+    border-left: 4px solid #3b82f6;
+  }
 
-.fysiek {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
+  .appointment.fysiek {
+    border-left: 4px solid #22c55e;
+  }
+
+  .appointment-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .appointment-notes {
+    font-size: 13px;
+    color: #374151;
+    margin-top: 4px;
+    max-height: 40px;
+    overflow: hidden;
+  }
+
+  .appointment-notes.expanded {
+    max-height: none;
+  }
+
+  .toggle-notes {
+    font-size: 12px;
+    color: #2563eb;
+    cursor: pointer;
+  }
+
+  .add-appointment {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #d1d5db;
+  }
+
+  .add-appointment input,
+  .add-appointment textarea,
+  .add-appointment select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    margin-bottom: 6px;
+  }
+
+  .add-appointment button {
+    background: #1f2a44;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
 </style>
+
 </head>
-
 <body>
-<div class="container">
 
-<h1>Mijn klanten</h1>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo">
+      <!-- Hier komt straks het echte logo -->
+      <span class="logo-text">ClarityFlow</span>
+    </div>
+    <div class="search">
+      <input type="text" id="searchInput" placeholder="Zoek klant...">
+    </div>
+  </header>
 
-<!-- Invoer -->
-<input id="naam" placeholder="Naam klant">
-<input id="datetime" type="datetime-local">
-<select id="locatieType">
-  <option value="online">Online afspraak</option>
-  <option value="fysiek">Fysieke afspraak</option>
-</select>
-<input id="locatie" placeholder="Locatie (Zoom / Kantoor / Adres)">
-<textarea id="notities" placeholder="Notities"></textarea>
-<button class="add" onclick="addClient()">Toevoegen</button>
+  <!-- Hoofdcontent -->
+  <main class="container">
 
-<!-- Filters -->
-<div class="controls">
-  <input id="search" placeholder="Zoek op klantnaam" oninput="render()">
-  <select id="filter" onchange="render()">
-    <option value="all">Alles</option>
-    <option value="open">Open</option>
-    <option value="done">Afgerond</option>
-  </select>
-</div>
+    <!-- Klant toevoegen -->
+    <section class="add-client">
+      <input type="text" id="newClientName" placeholder="Naam nieuwe klant">
+      <button id="addClientBtn">Klant toevoegen</button>
+    </section>
 
-<table>
-<thead>
-<tr>
-  <th class="col-naam">Naam</th>
-  <th class="col-datum">Datum & tijd</th>
-  <th class="col-locatie">Locatie</th>
-  <th class="col-notities">Notities</th>
-  <th class="col-acties">Acties</th>
-</tr>
-</thead>
-<tbody id="tableBody"></tbody>
-</table>
+    <!-- Klantkaarten -->
+    <section id="clientsContainer" class="clients">
 
-</div>
+      <!-- Voorbeeld kaart (wordt straks dynamisch via JS) -->
+      <!--
+      <div class="client-card">
+        <div class="client-header">
+          <h2>Jan de Vries</h2>
+          <button class="status-toggle active">Actief</button>
+        </div>
+
+        <div class="client-summary">
+          Laatste afspraak: 12-01-2026 10:00 (Online)
+        </div>
+
+        <div class="client-body">
+          <div class="appointments">
+            <!-- afspraken komen hier -->
+          </div>
+
+          <div class="add-appointment">
+            <!-- inline formulier komt hier -->
+          </div>
+        </div>
+      </div>
+      -->
+
+    </section>
+
+  </main>
 
 <script>
 let clients = JSON.parse(localStorage.getItem("clients")) || [];
 
-function formatDate(value) {
-  const d = new Date(value);
-  return `${String(d.getDate()).padStart(2,"0")}-${String(d.getMonth()+1).padStart(2,"0")}-${d.getFullYear()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
-}
+const clientsContainer = document.getElementById("clientsContainer");
+const addClientBtn = document.getElementById("addClientBtn");
+const newClientName = document.getElementById("newClientName");
+const searchInput = document.getElementById("searchInput");
 
 function save() {
   localStorage.setItem("clients", JSON.stringify(clients));
 }
 
-function render() {
-  const body = document.getElementById("tableBody");
-  body.innerHTML = "";
+function formatDateTime(value) {
+  const d = new Date(value);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
+}
 
-  const search = searchInput().toLowerCase();
-  const filter = filterSelect();
+function render() {
+  clientsContainer.innerHTML = "";
+
+  const search = searchInput.value.toLowerCase();
 
   clients
-    .sort((a,b) => new Date(a.datetime) - new Date(b.datetime))
-    .filter(c => c.naam.toLowerCase().includes(search))
-    .filter(c => filter === "all" || (filter === "open" && !c.done) || (filter === "done" && c.done))
-    .forEach((c,i) => {
+    .filter(c => c.name.toLowerCase().includes(search))
+    .forEach((client, index) => {
+      const card = document.createElement("div");
+      card.className = "client-card";
 
-      const row = document.createElement("tr");
-      if (c.done) row.classList.add("done");
-
-      row.innerHTML = `
-        <td class="col-naam">${c.naam}</td>
-        <td class="col-datum">${formatDate(c.datetime)}</td>
-        <td class="col-locatie">
-          <span class="badge ${c.type}">${c.type === "online" ? "Online" : "Fysiek"}</span><br>
-          ${c.locatie}
-        </td>
-        <td class="col-notities">
-          <div class="note">${c.notities}</div>
-          ${c.notities.length > 60 ? `<span class="toggle" onclick="toggleNote(this)">Meer tonen</span>` : ""}
-        </td>
-        <td class="col-acties">
-          <button onclick="edit(${i})">✏️</button>
-          <button onclick="toggleDone(${i})">✔️</button>
-          <button onclick="remove(${i})">🗑️</button>
-        </td>
+      const header = document.createElement("div");
+      header.className = "client-header";
+      header.innerHTML = `
+        <h2>${client.name}</h2>
+        <button class="status-toggle ${client.status}">
+          ${client.status === "active" ? "🟢 Actief" : "⚪ Afgerond"}
+        </button>
       `;
-      body.appendChild(row);
+
+      header.querySelector(".status-toggle").onclick = (e) => {
+        e.stopPropagation();
+        client.status = client.status === "active" ? "done" : "active";
+        save();
+        render();
+      };
+
+      header.onclick = () => {
+        card.classList.toggle("open");
+      };
+
+      const summary = document.createElement("div");
+      summary.className = "client-summary";
+      if (client.appointments.length > 0) {
+        const last = client.appointments[client.appointments.length - 1];
+        summary.textContent = `Laatste afspraak: ${formatDateTime(last.datetime)} (${last.type === "online" ? "Online" : "Fysiek"})`;
+      } else {
+        summary.textContent = "Nog geen afspraken";
+      }
+
+      const body = document.createElement("div");
+      body.className = "client-body";
+
+      client.appointments
+        .sort((a, b) => new Date(a.datetime) - new Date(b.datetime))
+        .forEach((appt, i) => {
+          const apptDiv = document.createElement("div");
+          apptDiv.className = `appointment ${appt.type}`;
+
+          apptDiv.innerHTML = `
+            <div class="appointment-header">
+              <span>${formatDateTime(appt.datetime)} – ${appt.type === "online" ? "Online" : "Fysiek"}</span>
+              <span>
+                <button onclick="editAppointment(${index}, ${i})">✏️</button>
+                <button onclick="toggleDone(${index}, ${i})">✔️</button>
+              </span>
+            </div>
+            <div class="appointment-notes">${appt.notes}</div>
+            ${appt.notes.length > 80 ? `<span class="toggle-notes" onclick="toggleNotes(this)">Meer tonen</span>` : ""}
+          `;
+
+          body.appendChild(apptDiv);
+        });
+
+      const addForm = document.createElement("div");
+      addForm.className = "add-appointment";
+      addForm.innerHTML = `
+        <input type="datetime-local" placeholder="Datum & tijd">
+        <select>
+          <option value="online">Online</option>
+          <option value="fysiek">Fysiek</option>
+        </select>
+        <textarea placeholder="Notities"></textarea>
+        <button>Afspraak toevoegen</button>
+      `;
+
+      const [dtInput, typeSelect, notesInput, addBtn] = addForm.children;
+
+      addBtn.onclick = () => {
+        if (!dtInput.value) return;
+
+        client.appointments.push({
+          datetime: dtInput.value,
+          type: typeSelect.value,
+          notes: notesInput.value,
+          done: false
+        });
+
+        save();
+        render();
+      };
+
+      body.appendChild(addForm);
+
+      card.appendChild(header);
+      card.appendChild(summary);
+      card.appendChild(body);
+
+      clientsContainer.appendChild(card);
     });
 }
 
-function searchInput() {
-  return document.getElementById("search").value;
+function toggleNotes(el) {
+  const notes = el.previousElementSibling;
+  notes.classList.toggle("expanded");
+  el.textContent = notes.classList.contains("expanded") ? "Minder tonen" : "Meer tonen";
 }
 
-function filterSelect() {
-  return document.getElementById("filter").value;
+function toggleDone(clientIndex, apptIndex) {
+  clients[clientIndex].appointments[apptIndex].done = !clients[clientIndex].appointments[apptIndex].done;
+  save();
+  render();
 }
 
-function addClient() {
-  if (!naam.value) return;
+function editAppointment(clientIndex, apptIndex) {
+  const appt = clients[clientIndex].appointments[apptIndex];
+  alert("Bewerken komt in de volgende stap (structuur staat al klaar).");
+}
+
+addClientBtn.onclick = () => {
+  if (!newClientName.value.trim()) return;
 
   clients.push({
-    naam: naam.value,
-    datetime: datetime.value,
-    type: locatieType.value,
-    locatie: locatie.value,
-    notities: notities.value,
-    done: false
+    name: newClientName.value,
+    status: "active",
+    appointments: []
   });
 
-  naam.value = datetime.value = locatie.value = notities.value = "";
+  newClientName.value = "";
   save();
   render();
-}
+};
 
-function edit(i) {
-  const c = clients[i];
-  naam.value = c.naam;
-  datetime.value = c.datetime;
-  locatieType.value = c.type;
-  locatie.value = c.locatie;
-  notities.value = c.notities;
-  clients.splice(i,1);
-  save();
-  render();
-}
-
-function toggleDone(i) {
-  clients[i].done = !clients[i].done;
-  save();
-  render();
-}
-
-function remove(i) {
-  if (confirm("Weet je zeker dat je deze klant wilt verwijderen?")) {
-    clients.splice(i,1);
-    save();
-    render();
-  }
-}
-
-function toggleNote(el) {
-  const note = el.previousElementSibling;
-  note.classList.toggle("expanded");
-  el.textContent = note.classList.contains("expanded") ? "Minder tonen" : "Meer tonen";
-}
+searchInput.oninput = render;
 
 render();
 </script>
 
-</body>
-</html>
